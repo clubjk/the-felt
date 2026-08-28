@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@source "./**/*.{ts,tsx}";
+@source "../spa/**/*.{ts,tsx}";
 
 @theme {
   --font-display: "Fraunces", ui-serif, Georgia, "Times New Roman", serif;

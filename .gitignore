@@ -5,6 +5,7 @@ node_modules
 .tanstack
 .grok
 dist
+dist-pages
 screenshots
 artifacts
 coverage

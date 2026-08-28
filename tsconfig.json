@@ -31,6 +31,8 @@
   },
   "include": [
     "src",
-    "server"
+    "server",
+    "spa",
+    "vite.pages.config.ts"
   ]
 }

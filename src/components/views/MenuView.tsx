@@ -45,7 +45,7 @@ export function MenuView() {
   const [shareLabel, setShareLabel] = useState<"Share" | "Copied">("Share");
 
   async function shareApp() {
-    const url = window.location.origin;
+    const url = new URL(import.meta.env.BASE_URL, window.location.origin).href.replace(/\/+$/, "");
     const payload = { ...SHARE, url };
     try {
       if (typeof navigator.share === "function") {
