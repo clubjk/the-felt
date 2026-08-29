@@ -79,7 +79,7 @@ export function StatsView() {
 
         <div className="flex flex-col gap-2 pt-4">
           <Button variant="secondary" onClick={rebuy}>
-            Reset bankroll to $1,000
+            Reset bankroll to $100
           </Button>
           <Button variant="ghost" onClick={resetRecord}>
             Clear record

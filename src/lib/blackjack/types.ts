@@ -100,7 +100,7 @@ export interface PersistedStats {
   };
 }
 
-export const SAVE_VERSION = 2;
+export const SAVE_VERSION = 3;
 export const STARTING_BANKROLL = 100;
 export const MIN_BET = 5;
 export const CHIP_VALUES = [5, 25, 100, 500] as const;
