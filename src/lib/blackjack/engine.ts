@@ -51,7 +51,7 @@ function loadChute(rules: Rules) {
   return { shoe: chute.shoe, cutRemaining: chute.cutRemaining, cutOut: false };
 }
 
-export function freshTable(bankroll: number, rules: Rules, bet = 25): TableState {
+export function freshTable(bankroll: number, rules: Rules, bet = MIN_BET): TableState {
   const capped = Math.min(Math.max(0, bet), bankroll);
   return {
     ...loadChute(rules),
@@ -60,7 +60,7 @@ export function freshTable(bankroll: number, rules: Rules, bet = 25): TableState
     dealer: [],
     holeRevealed: false,
     phase: "betting",
-    bet: capped < MIN_BET && bankroll >= MIN_BET ? Math.min(25, bankroll) : capped,
+    bet: capped < MIN_BET && bankroll >= MIN_BET ? Math.min(MIN_BET, bankroll) : capped,
     bankroll,
     insuranceBet: 0,
     firstAction: true,

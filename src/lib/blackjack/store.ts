@@ -248,7 +248,7 @@ export const useGame = create<GameStore>((set, get) => {
       unlockAudio();
       set({
         view: "play",
-        table: freshTable(bankroll, rules, Math.min(25, Math.max(bankroll, 0))),
+        table: freshTable(bankroll, rules, Math.min(MIN_BET, Math.max(bankroll, 0))),
         lastCoach: null,
         busy: false,
         runId: get().runId + 1,
@@ -326,7 +326,7 @@ export const useGame = create<GameStore>((set, get) => {
       set({
         bankroll: STARTING_BANKROLL,
         table: table
-          ? { ...table, bankroll: STARTING_BANKROLL, bet: 25, phase: "betting", playerHands: [], dealer: [] }
+          ? { ...table, bankroll: STARTING_BANKROLL, bet: MIN_BET, phase: "betting", playerHands: [], dealer: [] }
           : table,
       });
       get().persist();
