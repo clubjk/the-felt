@@ -4,7 +4,7 @@
 
 Blackjack trainer. Sit across from the dealer. Every hit, stand, double, split, and surrender is graded against basic strategy.
 
-**Rules:** 6-deck shoe · H17 · DAS · late surrender · blackjack pays 3:2  
+**Rules:** 4-deck chute · H17 · DAS · late surrender · blackjack pays 3:2  
 **Bankroll:** you sit down with $100
 
 ## Play

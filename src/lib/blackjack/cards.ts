@@ -20,7 +20,7 @@ export function makeCard(rank: Rank, suit: Suit): Card {
   return { rank, suit, id: `${rank}-${suit}-${seq}` };
 }
 
-export function buildShoe(decks: number): Card[] {
+export function buildUnshuffled(decks: number): Card[] {
   const cards: Card[] = [];
   for (let d = 0; d < decks; d += 1) {
     for (const suit of SUITS) {
@@ -29,7 +29,21 @@ export function buildShoe(decks: number): Card[] {
       }
     }
   }
-  return fisherYates(cards);
+  return cards;
+}
+
+export function buildShoe(decks: number): Card[] {
+  return fisherYates(buildUnshuffled(decks));
+}
+
+/** Shuffle a 4-deck chute, burn one, and cut so most of the shoe is dealt before reshuffle. */
+export function newChute(decks: number): { shoe: Card[]; cutRemaining: number } {
+  const shoe = buildShoe(decks);
+  const behindMin = Math.min(20, Math.max(8, Math.floor(shoe.length * 0.1)));
+  const behindMax = Math.min(36, Math.max(behindMin, Math.floor(shoe.length * 0.18)));
+  const cutRemaining = behindMin + Math.floor(Math.random() * (behindMax - behindMin + 1));
+  if (shoe.length > 0) shoe.pop();
+  return { shoe, cutRemaining };
 }
 
 export function fisherYates<T>(input: T[]): T[] {

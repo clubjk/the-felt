@@ -3,7 +3,7 @@ import { CardFan } from "@/components/cards/PlayingCard";
 import { Chip } from "@/components/cards/Chip";
 import { TopBar } from "@/components/layout/TopBar";
 import { Button } from "@/components/ui/button";
-import { dealerDisplay, legalForActive } from "@/lib/blackjack/engine";
+import { dealerDisplay, legalForActive, cardsAheadOfCut } from "@/lib/blackjack/engine";
 import { formatMoney, signedMoney } from "@/lib/blackjack/format";
 import { formatTotal } from "@/lib/blackjack/hand";
 import { hintLine } from "@/lib/blackjack/explain";
@@ -122,8 +122,8 @@ export function PlayView() {
                 </p>
               </>
             ) : (
-              <p className="py-10 text-sm text-subtle">
-                {table.phase === "shuffle" ? "Shuffling the shoe" : "Place a bet"}
+              <p className="py-10 text-center text-sm text-subtle">
+                {table.phase === "shuffle" ? "Shuffling and cutting the chute" : "Place a bet"}
               </p>
             )}
           </section>
@@ -143,7 +143,7 @@ export function PlayView() {
                 ))}
               </div>
             )}
-            {hand && table.phase !== "betting" ? (
+            {hand && table.phase !== "betting" && table.phase !== "shuffle" ? (
               <>
                 <CardFan cards={hand.cards} />
                 <div className="flex items-baseline gap-3">
@@ -151,9 +151,16 @@ export function PlayView() {
                   <p className="text-sm text-muted">{formatMoney(hand.bet)}</p>
                 </div>
               </>
-            ) : table.phase === "betting" ? (
-              <p className="font-display text-3xl tabular-nums">{formatMoney(table.bet)}</p>
-            ) : null}
+            ) : (
+              <>
+                <p className="font-display text-3xl tabular-nums">{formatMoney(table.bet)}</p>
+                <p className="text-xs text-subtle">
+                  {table.phase === "shuffle"
+                    ? "Shuffling and cutting a 4-deck chute"
+                    : `${cardsAheadOfCut(table)} cards ahead of the cut`}
+                </p>
+              </>
+            )}
           </section>
         </div>
 
@@ -235,7 +242,7 @@ export function PlayView() {
 
           {(table.phase === "dealer" || table.phase === "shuffle") && (
             <p className="h-14 text-center text-sm text-muted">
-              {table.phase === "shuffle" ? "Shuffling…" : "Dealer is playing"}
+              {table.phase === "shuffle" ? "Shuffling and cutting…" : "Dealer is playing"}
             </p>
           )}
 

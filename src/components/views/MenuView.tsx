@@ -173,7 +173,7 @@ export function MenuView() {
       </div>
 
       <p className="mt-6 text-center text-sm text-subtle">
-        6-deck · DAS · {hitSoft17 ? "dealer hits soft 17" : "dealer stands soft 17"}
+        4-deck chute · DAS · {hitSoft17 ? "dealer hits soft 17" : "dealer stands soft 17"}
         {decisions > 0 ? ` · ${pct(correct / decisions)} book` : ""}
       </p>
     </div>

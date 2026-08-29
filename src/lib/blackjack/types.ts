@@ -39,7 +39,7 @@ export interface Rules {
 }
 
 export const DEFAULT_RULES: Rules = {
-  decks: 6,
+  decks: 4,
   hitSoft17: true,
   lateSurrender: true,
   das: true,

@@ -1,7 +1,15 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { makeCard } from "./cards.ts";
-import { evaluateHand, emptyHand, dealerShouldHit } from "./engine.ts";
+import { makeCard, newChute, buildUnshuffled } from "./cards.ts";
+import {
+  evaluateHand,
+  emptyHand,
+  dealerShouldHit,
+  dealRound,
+  nextRound,
+  needsShuffle,
+  freshTable,
+} from "./engine.ts";
 import { legalActions, optimalAction } from "./strategy.ts";
 import { DEFAULT_RULES } from "./types.ts";
 
@@ -80,3 +88,32 @@ test("dealer hits soft 17 when H17", () => {
   assert.equal(dealerShouldHit(cards("10", "7"), rules), false);
   assert.equal(dealerShouldHit(cards("A", "7"), rules), false);
 });
+
+test("default game is a 4-deck chute", () => {
+  assert.equal(DEFAULT_RULES.decks, 4);
+  assert.equal(buildUnshuffled(4).length, 208);
+});
+
+test("new chute burns one and cuts before the last half-deck", () => {
+  const chute = newChute(4);
+  assert.equal(chute.shoe.length, 207);
+  assert.ok(chute.cutRemaining >= 20 && chute.cutRemaining <= 36);
+});
+
+test("hands play through the chute until the cut, then reshuffle", () => {
+  let table = freshTable(10000, rules, 25);
+  const startLen = table.shoe.length;
+  assert.equal(needsShuffle(table), false);
+  let rounds = 0;
+  while (!needsShuffle(table) && rounds < 80) {
+    table = dealRound(table, rules);
+    table = nextRound(table);
+    rounds += 1;
+  }
+  assert.ok(rounds >= 25, `expected a deep chute, only played ${rounds}`);
+  assert.ok(table.shoe.length < startLen);
+  assert.equal(needsShuffle(table), true);
+  const after = dealRound(table, rules);
+  assert.ok(after.shoe.length > 150);
+});
+

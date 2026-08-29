@@ -1,4 +1,4 @@
-import { buildShoe, draw, isTenValue } from "./cards";
+import { draw, isTenValue, newChute } from "./cards";
 import { explainDecision } from "./explain";
 import { handTotals, isFinished, naturalBlackjack } from "./hand";
 import { legalActions, optimalAction, situationKey } from "./strategy";
@@ -17,6 +17,8 @@ import { MIN_BET } from "./types";
 
 export interface TableState {
   shoe: Card[];
+  cutRemaining: number;
+  cutOut: boolean;
   playerHands: Hand[];
   active: number;
   dealer: Card[];
@@ -44,10 +46,15 @@ export function emptyHand(bet: number, extras: Partial<Hand> = {}): Hand {
   };
 }
 
+function loadChute(rules: Rules) {
+  const chute = newChute(rules.decks);
+  return { shoe: chute.shoe, cutRemaining: chute.cutRemaining, cutOut: false };
+}
+
 export function freshTable(bankroll: number, rules: Rules, bet = 25): TableState {
   const capped = Math.min(Math.max(0, bet), bankroll);
   return {
-    shoe: buildShoe(rules.decks),
+    ...loadChute(rules),
     playerHands: [],
     active: 0,
     dealer: [],
@@ -63,15 +70,21 @@ export function freshTable(bankroll: number, rules: Rules, bet = 25): TableState
   };
 }
 
-function take(state: TableState, rules: Rules): { card: Card; state: TableState } {
-  let shoe = state.shoe;
-  if (shoe.length === 0) shoe = buildShoe(rules.decks);
-  const drawn = draw(shoe);
-  return { card: drawn.card, state: { ...state, shoe: drawn.shoe } };
+function take(state: TableState): { card: Card; state: TableState } {
+  if (state.shoe.length === 0) {
+    throw new Error("Chute empty mid-round");
+  }
+  const drawn = draw(state.shoe);
+  const cutOut = state.cutOut || drawn.shoe.length <= state.cutRemaining;
+  return { card: drawn.card, state: { ...state, shoe: drawn.shoe, cutOut } };
 }
 
 export function needsShuffle(state: TableState): boolean {
-  return state.shoe.length < 78;
+  return state.cutOut || state.shoe.length <= state.cutRemaining;
+}
+
+export function cardsAheadOfCut(state: TableState): number {
+  return Math.max(0, state.shoe.length - state.cutRemaining);
 }
 
 export function addChip(state: TableState, chip: number): TableState {
@@ -240,8 +253,8 @@ export function dealRound(state: TableState, rules: Rules): TableState {
   const bet = Math.min(Math.max(MIN_BET, state.bet), state.bankroll);
 
   let next: TableState = state;
-  if (next.shoe.length < 78) {
-    next = { ...next, shoe: buildShoe(rules.decks) };
+  if (needsShuffle(next)) {
+    next = { ...next, ...loadChute(rules) };
   }
 
   next = {
@@ -259,7 +272,7 @@ export function dealRound(state: TableState, rules: Rules): TableState {
   let dealer: Card[] = [];
   const order = ["p", "d", "p", "d"] as const;
   for (const dest of order) {
-    const t = take(next, rules);
+    const t = take(next);
     next = t.state;
     if (dest === "p") player = { ...player, cards: [...player.cards, t.card] };
     else dealer = [...dealer, t.card];
@@ -332,7 +345,7 @@ export function applyAction(state: TableState, rules: Rules, action: Action): Ta
   if (!legal[action]) return state;
 
   if (action === "hit") {
-    const d = take(state, rules);
+    const d = take(state);
     const h: Hand = { ...hand, cards: [...hand.cards, d.card] };
     const hands = d.state.playerHands.map((x, i) => (i === idx ? h : x));
     return finishOrContinue({ ...d.state, playerHands: hands, firstAction: false });
@@ -345,7 +358,7 @@ export function applyAction(state: TableState, rules: Rules, action: Action): Ta
   }
 
   if (action === "double") {
-    const d = take(state, rules);
+    const d = take(state);
     const h: Hand = {
       ...hand,
       cards: [...hand.cards, d.card],
@@ -376,10 +389,10 @@ export function applyAction(state: TableState, rules: Rules, action: Action): Ta
   let handA = emptyHand(hand.bet, { cards: [aCard], fromSplit: true, fromAceSplit: fromAce });
   let handB = emptyHand(hand.bet, { cards: [bCard], fromSplit: true, fromAceSplit: fromAce });
 
-  const d1 = take(n, rules);
+  const d1 = take(n);
   n = d1.state;
   handA = { ...handA, cards: [aCard, d1.card] };
-  const d2 = take(n, rules);
+  const d2 = take(n);
   n = d2.state;
   handB = { ...handB, cards: [bCard, d2.card] };
 
@@ -394,7 +407,7 @@ export function applyAction(state: TableState, rules: Rules, action: Action): Ta
 }
 
 export function dealerDraw(state: TableState, rules: Rules): TableState {
-  const d = take(state, rules);
+  const d = take(state);
   return { ...d.state, dealer: [...d.state.dealer, d.card], holeRevealed: true };
 }
 
