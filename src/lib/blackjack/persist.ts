@@ -35,7 +35,7 @@ function migrate(raw: PersistedStats): PersistedStats {
     settings: { ...base.settings, ...raw.settings },
     byKey: raw.byKey ?? {},
   };
-  if ((raw.version ?? 0) < 3) {
+  if ((raw.version ?? 0) < 4) {
     next.bankroll = STARTING_BANKROLL;
   }
   return next;

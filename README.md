@@ -5,7 +5,7 @@
 Blackjack trainer. Sit across from the dealer. Every hit, stand, double, split, and surrender is graded against basic strategy.
 
 **Rules:** 4-deck chute · H17 · DAS · late surrender · blackjack pays 3:2  
-**Bankroll:** you sit down with $100
+**Bankroll:** you sit down with $200. Ante is $15.
 
 ## Play
 
