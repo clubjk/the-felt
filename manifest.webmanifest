@@ -1,0 +1,22 @@
+{
+  "name": "The Felt",
+  "short_name": "The Felt",
+  "description": "Blackjack trainer. Sit across from the dealer and learn basic strategy.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0E3A2C",
+  "theme_color": "#0E3A2C",
+  "icons": [
+    {
+      "src": "apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
